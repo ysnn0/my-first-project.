@@ -1,31 +1,19 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const app = express();
-const port = 3000;
-
-// CORS ayarı
 app.use(cors());
+app.use(express.json());
 
-// Body parser middleware
-app.use(bodyParser.json());
+const results = [];
 
-// Veritabanı veya localStorage yerine burada basit bir in-memory veri tutacağız
-let results = [];
-
-// Test verilerini alacak endpoint
 app.post('/submit-initial', (req, res) => {
-  const { user, score, avgTime, responses } = req.body;
-
-  // Veriyi alıp results array'ine ekliyoruz
-  results.push({ user, score, avgTime, responses });
-  console.log("Received result:", req.body);
-
-  // Başarılı bir yanıt döndürüyoruz
-  res.status(200).json({ message: "Data saved successfully!" });
+  results.push(req.body);
+  res.json({ status: 'ok' });
 });
 
-// Deploy sırasında kullanılacak port
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+app.get('/all-results', (req, res) => {
+  res.json(results);
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
