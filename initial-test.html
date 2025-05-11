@@ -1,4 +1,3 @@
-<!-- initial-test.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,8 +129,15 @@
           responses
         };
 
-        const safeKey = "initial_result_" + userName.toLowerCase().trim().replace(/\s+/g, "_");
-        localStorage.setItem(safeKey, JSON.stringify(payload));
+        // Veri gönderimi
+        fetch('https://your-backend-url.com/submit-initial', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => console.log("Data saved:", data))
+        .catch(error => console.error("Error saving data:", error));
 
         initDiv.style.display = 'none';
         thankYou.style.display = 'block';
@@ -158,11 +164,6 @@
 
       startTime = Date.now();
     }
-    fetch('/submit-initial', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(data)
-});
   </script>
 </body>
 </html>
