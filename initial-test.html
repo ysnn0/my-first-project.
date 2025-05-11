@@ -158,15 +158,40 @@
       btn.textContent = opt;
       btn.className = 'option-btn';
       btn.onclick = () => {
-        responses.push({ correct: opt === cur.meaningEn, time: Date.now() - startTime });
-        initIdx++;
-        nextInit();
-      };
+  responses.push({ correct: opt === cur.meaningEn, time: Date.now() - startTime });
+
+  if (initIdx === idioms.length - 1) {
+    finishTest();
+  } else {
+    initIdx++;
+    nextInit();
+  }
+};
       initO.appendChild(btn);
     });
 
     startTime = Date.now();
   }
+  function finishTest() {
+  const score = responses.filter(r => r.correct).length;
+  const avgTime = responses.reduce((sum, r) => sum + r.time, 0) / responses.length;
+
+  const payload = {
+    user: userName,
+    score,
+    avgTime: avgTime.toFixed(2),
+    responses
+  };
+
+  fetch('https://idiom-backend.onrender.com/submit-initial', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  initDiv.style.display = 'none';
+  thankYou.style.display = 'block';
+}
 </script>
 </body>
 </html>
