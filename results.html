@@ -2,138 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Test Results</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Results</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121212;
-      color: #e0e0e0;
+      font-family: Arial, sans-serif;
       padding: 20px;
     }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
+    .result {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0 auto;
-      background-color: #1e1e1e;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    th, td {
-      padding: 12px;
-      text-align: center;
-      border-bottom: 1px solid #333;
-    }
-
-    th {
-      background-color: #272727;
-      color: #bb86fc;
-    }
-
-    tr:hover {
-      background-color: #2a2a2a;
-    }
-
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-
-      thead {
-        display: none;
-      }
-
-      td {
-        position: relative;
-        padding-left: 50%;
-        text-align: left;
-        border: none;
-        border-bottom: 1px solid #333;
-      }
-
-      td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 15px;
-        font-weight: bold;
-        color: #bb86fc;
-      }
-
-      tr {
-        margin-bottom: 15px;
-      }
+    .result h3 {
+      margin: 0 0 5px 0;
     }
   </style>
 </head>
 <body>
   <h1>Initial Test Results</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>User</th>
-        <th>Score</th>
-        <th>Avg Time (ms)</th>
-        <th>Correct</th>
-        <th>Wrong</th>
-      </tr>
-    </thead>
-    <tbody id="resultsTable"></tbody>
-  </table>
+  <div id="container">
+    <p>Loading...</p>
+  </div>
 
   <script>
-  const ADMIN_PASS = "admin123";
-  const container = document.getElementById("container");
-  const pass = prompt("Enter admin password:");
+    fetch('https://idiom-backend.onrender.com/results') // Backend URL'ni burada kullanıyoruz
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('container');
+        container.innerHTML = '';
 
-  if (pass !== ADMIN_PASS) {
-    container.innerHTML = '<h2 class="denied">Access denied.</h2>';
-  } else {
-    container.innerHTML = '<h2>All Initial Test Results</h2>';
-
-    fetch('https://idiom-backend.onrender.com/all-results')
-      .then(res => res.json())
-      .then(results => {
-        if (!results.length) {
-          container.innerHTML += "<p>No results found.</p>";
-          return;
-        }
-
-        results.forEach(data => {
-          const userDiv = document.createElement("div");
-          userDiv.className = "user-block";
-
-          const h3 = document.createElement("h3");
-          h3.textContent = `👤 ${data.user}`;
-          userDiv.appendChild(h3);
-
-          const summary = document.createElement("p");
-          summary.className = "summary";
-          summary.textContent = `Correct: ${data.score}/15 | Avg. Time: ${data.avgTime} ms`;
-          userDiv.appendChild(summary);
-
-          data.responses.forEach((r, i) => {
-            const line = document.createElement("div");
-            line.className = "response " + (r.correct ? "correct" : "wrong");
-            line.textContent = `Q${i + 1}: ${r.correct ? "✅ Correct" : "❌ Wrong"} (${r.time} ms)`;
-            userDiv.appendChild(line);
+        if (data.length === 0) {
+          container.innerHTML = "<p>No results found.</p>";
+        } else {
+          data.forEach(result => {
+            const div = document.createElement('div');
+            div.className = 'result';
+            div.innerHTML = `
+              <h3>${result.user}</h3>
+              <p><strong>Score:</strong> ${result.score}</p>
+              <p><strong>Average Time:</strong> ${result.avgTime} ms</p>
+            `;
+            container.appendChild(div);
           });
-
-          container.appendChild(userDiv);
-        });
+        }
       })
       .catch(err => {
-        console.error("Veriler alınamadı:", err);
-        container.innerHTML += "<p style='color: red;'>Sunucudan veri alınamadı.</p>";
+        document.getElementById('container').innerHTML = "<p>Error loading results.</p>";
+        console.error('Error:', err);
       });
-  }
-</script>
+  </script>
 </body>
 </html>
