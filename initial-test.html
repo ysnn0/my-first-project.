@@ -1,3 +1,4 @@
+<!-- initial-test.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,129 +70,94 @@
   </div>
 
   <script>
-  const idioms = [
-    { text: "To get off the hook", meaningEn: "To escape from an unpleasant situation" },
-    { text: "To fly off the handle", meaningEn: "To lose your temper suddenly" },
-    { text: "To lay something at somebody’s door", meaningEn: "To blame someone for something" },
-    { text: "To paint the town red", meaningEn: "To go out and party exuberantly" },
-    { text: "To get cold feet", meaningEn: "To suddenly become nervous or afraid to do something" },
-    { text: "To hang fire", meaningEn: "To delay making a decision" },
-    { text: "To stick to your guns", meaningEn: "To maintain your position firmly" },
-    { text: "To have had your fill of something", meaningEn: "To be fed up or tired of something" },
-    { text: "To sit on the fence", meaningEn: "To avoid taking sides in a dispute" },
-    { text: "To be in for it", meaningEn: "To be about to experience something unpleasant" },
-    { text: "To play the field", meaningEn: "To date multiple people without committing" },
-    { text: "To show your hand", meaningEn: "To reveal your intentions or plans" },
-    { text: "To wear your heart on your sleeve", meaningEn: "To openly show your emotions" },
-    { text: "To carry the day", meaningEn: "To win or succeed in a conflict or competition" },
-    { text: "To manage to keep a straight face", meaningEn: "To not laugh or show emotion" }
-  ];
+    const idioms = [
+      { text: "To get off the hook", meaningEn: "To escape from an unpleasant situation" },
+      { text: "To fly off the handle", meaningEn: "To lose your temper suddenly" },
+      { text: "To lay something at somebody’s door", meaningEn: "To blame someone for something" },
+      { text: "To paint the town red", meaningEn: "To go out and party exuberantly" },
+      { text: "To get cold feet", meaningEn: "To suddenly become nervous or afraid to do something" },
+      { text: "To hang fire", meaningEn: "To delay making a decision" },
+      { text: "To stick to your guns", meaningEn: "To maintain your position firmly" },
+      { text: "To have had your fill of something", meaningEn: "To be fed up or tired of something" },
+      { text: "To sit on the fence", meaningEn: "To avoid taking sides in a dispute" },
+      { text: "To be in for it", meaningEn: "To be about to experience something unpleasant" },
+      { text: "To play the field", meaningEn: "To date multiple people without committing" },
+      { text: "To show your hand", meaningEn: "To reveal your intentions or plans" },
+      { text: "To wear your heart on your sleeve", meaningEn: "To openly show your emotions" },
+      { text: "To carry the day", meaningEn: "To win or succeed in a conflict or competition" },
+      { text: "To manage to keep a straight face", meaningEn: "To not laugh or show emotion" }
+    ];
 
-  let userName = '';
-  let initIdx = 0;
-  let responses = [];
-  let startTime = 0;
+    let userName = '';
+    let initIdx = 0;
+    let responses = [];
+    let startTime = 0;
 
-  const entry = document.getElementById('entry');
-  const startBtn = document.getElementById('startBtn');
-  const userNameInput = document.getElementById('userName');
-  const initDiv = document.getElementById('initialTest');
-  const initQ = document.getElementById('initQuestion');
-  const initO = document.getElementById('initOptions');
-  const thankYou = document.getElementById('thankYou');
+    const entry = document.getElementById('entry');
+    const startBtn = document.getElementById('startBtn');
+    const userNameInput = document.getElementById('userName');
+    const initDiv = document.getElementById('initialTest');
+    const initQ = document.getElementById('initQuestion');
+    const initO = document.getElementById('initOptions');
+    const thankYou = document.getElementById('thankYou');
 
-  userNameInput.addEventListener('input', () => {
-    startBtn.disabled = userNameInput.value.trim() === '';
-  });
-
-  startBtn.addEventListener('click', () => {
-    userName = userNameInput.value.trim();
-    if (!userName) return;
-    entry.style.display = 'none';
-    initDiv.style.display = 'block';
-    nextInit();
-  });
-
-  function getRandomWrong(correctIdx) {
-    const pool = idioms.filter((_, i) => i !== correctIdx);
-    return pool[Math.floor(Math.random() * pool.length)];
-  }
-
-  function nextInit() {
-    if (initIdx >= idioms.length) {
-      const score = responses.filter(r => r.correct).length;
-      const avgTime = responses.reduce((sum, r) => sum + r.time, 0) / responses.length;
-
-      const payload = {
-        user: userName,
-        score,
-        avgTime: avgTime.toFixed(2),
-        responses
-      };
-
-      fetch('https://your-backend-url.com/submit-initial', {  // <-- Buraya backend URL'nizi koymalısınız
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-        initDiv.style.display = 'none';
-        thankYou.style.display = 'block';
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-
-      return;
-    }
-
-    const cur = idioms[initIdx];
-    initQ.textContent = `${initIdx + 1}. ${cur.text}`;
-    initO.innerHTML = '';
-
-    const wrong = getRandomWrong(initIdx);
-    const opts = [cur.meaningEn, wrong.meaningEn].sort();
-    opts.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.textContent = opt;
-      btn.className = 'option-btn';
-      btn.onclick = () => {
-  responses.push({ correct: opt === cur.meaningEn, time: Date.now() - startTime });
-
-  if (initIdx === idioms.length - 1) {
-    finishTest();
-  } else {
-    initIdx++;
-    nextInit();
-  }
-};
-      initO.appendChild(btn);
+    userNameInput.addEventListener('input', () => {
+      startBtn.disabled = userNameInput.value.trim() === '';
     });
 
-    startTime = Date.now();
-  }
-  function finishTest() {
-  const score = responses.filter(r => r.correct).length;
-  const avgTime = responses.reduce((sum, r) => sum + r.time, 0) / responses.length;
+    startBtn.addEventListener('click', () => {
+      userName = userNameInput.value.trim();
+      if (!userName) return;
+      entry.style.display = 'none';
+      initDiv.style.display = 'block';
+      nextInit();
+    });
 
-  const payload = {
-    user: userName,
-    score,
-    avgTime: avgTime.toFixed(2),
-    responses
-  };
+    function getRandomWrong(correctIdx) {
+      const pool = idioms.filter((_, i) => i !== correctIdx);
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
 
-  fetch('https://idiom-backend.onrender.com/submit-initial', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+    function nextInit() {
+      if (initIdx >= idioms.length) {
+        const score = responses.filter(r => r.correct).length;
+        const avgTime = responses.reduce((sum, r) => sum + r.time, 0) / responses.length;
 
-  initDiv.style.display = 'none';
-  thankYou.style.display = 'block';
-}
-</script>
+        const payload = {
+          user: userName,
+          score,
+          avgTime: avgTime.toFixed(2),
+          responses
+        };
+
+        const safeKey = "initial_result_" + userName.toLowerCase().trim().replace(/\s+/g, "_");
+        localStorage.setItem(safeKey, JSON.stringify(payload));
+
+        initDiv.style.display = 'none';
+        thankYou.style.display = 'block';
+        return;
+      }
+
+      const cur = idioms[initIdx];
+      initQ.textContent = `${initIdx + 1}. ${cur.text}`;
+      initO.innerHTML = '';
+
+      const wrong = getRandomWrong(initIdx);
+      const opts = [cur.meaningEn, wrong.meaningEn].sort();
+      opts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.className = 'option-btn';
+        btn.onclick = () => {
+          responses.push({ correct: opt === cur.meaningEn, time: Date.now() - startTime });
+          initIdx++;
+          nextInit();
+        };
+        initO.appendChild(btn);
+      });
+
+      startTime = Date.now();
+    }
+  </script>
 </body>
 </html>
