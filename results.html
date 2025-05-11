@@ -1,91 +1,115 @@
-<!-- results.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>All Initial Test Results</title>
+  <title>Test Results</title>
   <style>
     body {
+      font-family: 'Segoe UI', sans-serif;
       background: #121212;
       color: #e0e0e0;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 40px;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: #1e1e1e;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-    }
-    h2 { color: #bb86fc; text-align: center; }
-    .user-block {
-      margin-top: 30px;
       padding: 20px;
-      border: 1px solid #333;
-      border-radius: 8px;
-      background: #181818;
     }
-    .response {
-      margin-top: 8px;
-      padding: 6px;
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto;
+      background-color: #1e1e1e;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
       border-bottom: 1px solid #333;
     }
-    .correct { color: #00e676; }
-    .wrong { color: #ff5252; }
-    .summary { margin-top: 10px; color: #ccc; }
-    .denied { text-align: center; color: red; margin-top: 50px; }
+
+    th {
+      background-color: #272727;
+      color: #bb86fc;
+    }
+
+    tr:hover {
+      background-color: #2a2a2a;
+    }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      td {
+        position: relative;
+        padding-left: 50%;
+        text-align: left;
+        border: none;
+        border-bottom: 1px solid #333;
+      }
+
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        font-weight: bold;
+        color: #bb86fc;
+      }
+
+      tr {
+        margin-bottom: 15px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container" id="container"></div>
+  <h1>Initial Test Results</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Score</th>
+        <th>Avg Time (ms)</th>
+        <th>Correct</th>
+        <th>Wrong</th>
+      </tr>
+    </thead>
+    <tbody id="resultsTable"></tbody>
+  </table>
 
   <script>
-    const ADMIN_PASS = "admin123"; // Şifrenizi buradan ayarlayın
-    const container = document.getElementById("container");
-    const pass = prompt("Enter admin password:");
-
-    if (pass !== ADMIN_PASS) {
-      container.innerHTML = '<h2 class="denied">Access denied.</h2>';
-    } else {
-      container.innerHTML = '<h2>All Initial Test Results</h2>';
-      const allKeys = Object.keys(localStorage);
-      const userResults = allKeys.filter(k => k.startsWith("initial_result_"));
-
-      if (userResults.length === 0) {
-        container.innerHTML += "<p>No results found.</p>";
-      }
-
-      userResults.forEach(key => {
-        try {
-          const data = JSON.parse(localStorage.getItem(key));
-          const userDiv = document.createElement("div");
-          userDiv.className = "user-block";
-
-          const h3 = document.createElement("h3");
-          h3.textContent = `👤 ${data.user}`;
-          userDiv.appendChild(h3);
-
-          const summary = document.createElement("p");
-          summary.className = "summary";
-          summary.textContent = `Correct: ${data.score}/15 | Avg. Time: ${data.avgTime} ms`;
-          userDiv.appendChild(summary);
-
-          data.responses.forEach((r, i) => {
-            const line = document.createElement("div");
-            line.className = "response " + (r.correct ? "correct" : "wrong");
-            line.textContent = `Q${i + 1}: ${r.correct ? "✅ Correct" : "❌ Wrong"} (${r.time} ms)`;
-            userDiv.appendChild(line);
-          });
-
-          container.appendChild(userDiv);
-        } catch (err) {
-          console.warn("Error reading result:", key);
-        }
+    fetch("https://idiom-backend.onrender.com/results")
+      .then(res => res.json())
+      .then(data => {
+        const table = document.getElementById("resultsTable");
+        data.forEach(entry => {
+          const correctCount = entry.responses.filter(r => r.correct).length;
+          const wrongCount = entry.responses.length - correctCount;
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td data-label="User">${entry.user}</td>
+            <td data-label="Score">${entry.score}</td>
+            <td data-label="Avg Time">${entry.avgTime}</td>
+            <td data-label="Correct">${correctCount}</td>
+            <td data-label="Wrong">${wrongCount}</td>
+          `;
+          table.appendChild(row);
+        });
+      })
+      .catch(err => {
+        console.error("Error loading results:", err);
       });
-    }
   </script>
 </body>
 </html>
