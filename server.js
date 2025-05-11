@@ -1,34 +1,17 @@
 const express = require('express');
-const path = require('path');
+const cors = require('cors');
+const path = require('path'); // path modülünü dahil et
 const app = express();
-const port = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+// CORS ve JSON parsing middleware
+app.use(cors());
+app.use(express.json());  // JSON verilerini alabilmek için
 
-// Tüm verileri bellekte tutacağız
-let allResults = [];
+// Statik dosyalara erişim sağlamak için
+app.use(express.static(path.join(__dirname, 'public'))); // public klasörü içindeki tüm dosyalara erişim sağla
 
-// Kullanıcıdan gelen sonuçları kaydet
-app.post('/submit-initial', (req, res) => {
-  const { user, score, avgTime, responses } = req.body;
-
-  const resultData = { user, score, avgTime, responses };
-  allResults.push(resultData);
-
-  res.status(200).json({ message: 'Result saved successfully' });
-});
-
-// Tüm sonuçları döndür
-app.get('/results', (req, res) => {
-  res.status(200).json(allResults);
-});
-
-// Ana sayfa yönlendirmesi
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'initial-test.html'));
-});
-
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+// Sunucu başlatma
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
 });
