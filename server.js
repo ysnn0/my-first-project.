@@ -1,35 +1,31 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // path modülünü dahil et
+const bodyParser = require('body-parser');
 const app = express();
+const port = 3000;
 
-// CORS ve JSON parsing middleware
+// CORS ayarı
 app.use(cors());
-app.use(express.json());  // JSON verilerini alabilmek için
 
-// Statik dosyalara erişim sağlamak için
-app.use(express.static(path.join(__dirname, 'public'))); // public klasörü içindeki tüm dosyalara erişim sağla
+// Body parser middleware
+app.use(bodyParser.json());
 
-// Sunucu başlatma
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-});
-const fs = require('fs');
+// Veritabanı veya localStorage yerine burada basit bir in-memory veri tutacağız
+let results = [];
 
+// Test verilerini alacak endpoint
 app.post('/submit-initial', (req, res) => {
-  const data = req.body;
-  const filePath = path.join(__dirname, 'data', 'initial-results.json');
+  const { user, score, avgTime, responses } = req.body;
 
-  // Klasör yoksa oluştur
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  // Veriyi alıp results array'ine ekliyoruz
+  results.push({ user, score, avgTime, responses });
+  console.log("Received result:", req.body);
 
-  // Dosyaya yaz (var olanın üzerine yazar)
-  fs.writeFile(filePath, JSON.stringify(data, null, 2), err => {
-    if (err) {
-      console.error('Hata oluştu:', err);
-      return res.status(500).json({ message: 'Veri kaydedilemedi' });
-    }
-    res.json({ message: 'Başarıyla kaydedildi' });
-  });
+  // Başarılı bir yanıt döndürüyoruz
+  res.status(200).json({ message: "Data saved successfully!" });
+});
+
+// Deploy sırasında kullanılacak port
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });
