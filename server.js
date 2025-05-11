@@ -16,7 +16,6 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
 const fs = require('fs');
-const path = require('path');
 
 app.post('/submit-initial', (req, res) => {
   const data = req.body;
