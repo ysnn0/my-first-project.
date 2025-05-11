@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Results</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      min-height: 100vh;
+    }
+    .container {
+      background: #1e1e1e;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+    }
+    canvas {
+      margin-top: 40px;
+      background: #1e1e1e;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Results for <span id="userName"></span></h1>
+    <p id="scoreInfo"></p>
+    <p id="timeInfo"></p>
+    <canvas id="resultChart" width="400" height="200"></canvas>
+  </div>
+
+  <script>
+    window.onload = function () {
+      const data = JSON.parse(localStorage.getItem('idiomResults'));
+
+      if (!data) {
+        document.body.innerHTML = '<p style="color:red;">No result data found.</p>';
+        return;
+      }
+
+      // Ekrana verileri bas
+      document.getElementById('userName').textContent = data.userName;
+      document.getElementById('scoreInfo').textContent = `Correct Answers: Before ${data.scoreBefore}, After ${data.scoreAfter}`;
+      document.getElementById('timeInfo').textContent = `Avg. Response Time: Before ${data.avgTimeBefore.toFixed(2)} ms, After ${data.avgTimeAfter.toFixed(2)} ms`;
+
+      // Grafik oluştur
+      new Chart(document.getElementById('resultChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: data.responsesPost.map((_, i) => `Q${i + 1}`),
+          datasets: [
+            {
+              label: 'Before',
+              data: data.responsesInit.map(r => r.time),
+              backgroundColor: '#bb86fc'
+            },
+            {
+              label: 'After',
+              data: data.responsesPost.map(r => r.time),
+              backgroundColor: '#03dac5'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Response Times Before and After'
+            }
+          }
+        }
+      });
+
+      // Backend'e veriyi gönder
+      fetch('http://localhost:3000/save-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        console.log('Veri başarıyla gönderildi:', result);
+      })
+      .catch(error => {
+        console.error('Veri gönderme hatası:', error);
+      });
+    };
+  </script>
+</body>
+</html>
