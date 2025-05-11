@@ -129,18 +129,30 @@
           responses
         };
 
-        // Veri gönderimi
-        fetch('https://your-backend-url.com/submit-initial', {
+        // LocalStorage'a kaydetme
+        const safeKey = "initial_result_" + userName.toLowerCase().trim().replace(/\s+/g, "_");
+        localStorage.setItem(safeKey, JSON.stringify(payload));
+
+        // Backend'e verileri gönderme
+        fetch('https://idiom-backend.onrender.com/submit-initial', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         })
         .then(response => response.json())
-        .then(data => console.log("Data saved:", data))
-        .catch(error => console.error("Error saving data:", error));
+        .then(data => {
+          console.log('Success:', data);
+          // Test bitince teşekkür sayfasını göster
+          initDiv.style.display = 'none';
+          thankYou.style.display = 'block';
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // Hata durumunda da teşekkür sayfasını göster
+          initDiv.style.display = 'none';
+          thankYou.style.display = 'block';
+        });
 
-        initDiv.style.display = 'none';
-        thankYou.style.display = 'block';
         return;
       }
 
