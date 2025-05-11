@@ -118,56 +118,40 @@
     }
 
     function nextInit() {
-      if (initIdx >= idioms.length) {
-        const score = responses.filter(r => r.correct).length;
-        const avgTime = responses.reduce((sum, r) => sum + r.time, 0) / responses.length;
+  if (initIdx >= idioms.length) {
+    const score = responses.filter(r => r.correct).length;
+    const avgTime = responses.reduce((sum, r) => sum + r.time, 0) / responses.length;
 
-        const payload = {
-          user: userName,
-          score,
-          avgTime: avgTime.toFixed(2),
-          responses
-        };
+    const payload = {
+      user: userName,
+      score,
+      avgTime: avgTime.toFixed(2),
+      responses
+    };
 
-        // 🟢 Artık veriyi sunucuya gönderiyoruz!
-        fetch('https://idiom-backend.onrender.com/submit-initial', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(() => {
-          initDiv.style.display = 'none';
-          thankYou.style.display = 'block';
-        })
-        .catch(err => {
-          console.error("Gönderim hatası:", err);
-          alert("Sonuçlar gönderilemedi. Lütfen tekrar deneyin.");
-        });
+    // Yerel olarak da sakla
+    const safeKey = "initial_result_" + userName.toLowerCase().trim().replace(/\s+/g, "_");
+    localStorage.setItem(safeKey, JSON.stringify(payload));
 
-        return;
-      }
+    // ✅ Sunucuya gönder
+    fetch('https://idiom-backend.onrender.com/submit-initial', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => console.log("Veri gönderildi:", data))
+    .catch(err => console.error("Gönderme hatası:", err));
 
-      const cur = idioms[initIdx];
-      initQ.textContent = `${initIdx + 1}. ${cur.text}`;
-      initO.innerHTML = '';
+    initDiv.style.display = 'none';
+    thankYou.style.display = 'block';
+    return;
+  }
 
-      const wrong = getRandomWrong(initIdx);
-      const opts = [cur.meaningEn, wrong.meaningEn].sort();
-      opts.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.textContent = opt;
-        btn.className = 'option-btn';
-        btn.onclick = () => {
-          responses.push({ correct: opt === cur.meaningEn, time: Date.now() - startTime });
-          initIdx++;
-          nextInit();
-        };
-        initO.appendChild(btn);
-      });
+  // Devam eden soru bölümü burada kalıyor
+  
+}
 
-      startTime = Date.now();
-    }
   </script>
 </body>
 </html>
