@@ -1,4 +1,3 @@
-<!-- initial-test.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,7 @@
   <title>Initial Idiom Test</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Roboto', sans-serif;
       background: #121212;
       color: #e0e0e0;
       display: flex;
@@ -16,35 +15,115 @@
       justify-content: center;
       min-height: 100vh;
       padding: 20px;
+      line-height: 1.6;
+      box-sizing: border-box;
     }
     .container {
       background: #1e1e1e;
       padding: 40px;
       border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
       max-width: 700px;
       width: 100%;
       text-align: center;
+      border-top: 5px solid #CDA488;
+      box-sizing: border-box;
     }
-    input, button {
-      padding: 12px 24px;
+    h1 { color: #CDA488; margin-bottom: 10px; font-size: 2.5em; }
+    h2 { color: #cccccc; margin: 0 0 30px; font-size: 1.8em; }
+    p { margin-bottom: 15px; font-size: 1.1em; }
+
+    input[type="text"] {
+      padding: 12px 20px;
       font-size: 16px;
       border-radius: 8px;
-      border: none;
+      border: 1px solid #333;
       background: #333;
-      color: #fff;
+      color: #CDA488;
       margin-top: 10px;
+      width: calc(100% - 44px);
+      box-sizing: border-box;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    input:focus { outline: 2px solid #bb86fc; }
-    button:hover { background: #444; }
+    input[type="text"]::placeholder { color: rgba(205, 164, 136, 0.7); }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #CDA488;
+      box-shadow: 0 0 10px rgba(205, 164, 136, 0.6);
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 17px;
+      border-radius: 8px;
+      border: none;
+      background: #CDA488;
+      color: #121212;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s ease;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    button:disabled {
+      background: #555;
+      color: #888;
+      cursor: not-allowed;
+      transform: none;
+    }
+    button:hover:not(:disabled) {
+      background: #b8860b;
+      transform: translateY(-2px);
+    }
+
     .option-btn {
-      margin: 10px;
-      background: #292929;
-      padding: 10px 20px;
+      margin: 8px;
+      background: #333;
+      color: #e0e0e0;
+      padding: 12px 20px;
       border-radius: 8px;
       cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      border: 1px solid #333;
+      min-width: 150px;
+      text-align: center;
+      display: inline-block;
+      position: relative;
+      overflow: hidden;
     }
-    .option-btn:hover { background: #444; }
+    .option-btn:hover {
+      background: #555;
+      color: #CDA488;
+      border-color: #555;
+    }
+    .option-img {
+      display: block;
+      max-width: 220px;
+      margin: 10px auto 0;
+    }
+
+    #initQuestion {
+      font-size: 22px;
+      margin: 30px 0;
+      color: #CDA488;
+      padding: 20px;
+      background: #292929;
+      border-left: 4px solid #CDA488;
+      border-radius: 8px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+    #initOptions {
+      margin-top: 20px;
+      display: none;
+    }
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.5s ease-out;
+    }
   </style>
 </head>
 <body>
@@ -59,8 +138,8 @@
 
     <div id="initialTest" style="display:none;">
       <h2>Choose the correct meaning:</h2>
-      <div id="initQuestion" style="font-size: 20px; margin-top: 20px;"></div>
-      <div id="initOptions" style="margin-top: 20px;"></div>
+      <div id="initQuestion"></div>
+      <div id="initOptions"></div>
     </div>
 
     <div id="thankYou" style="display:none;">
@@ -71,21 +150,22 @@
 
   <script>
     const idioms = [
-      { text: "To get off the hook", meaningEn: "To escape from an unpleasant situation" },
-      { text: "To fly off the handle", meaningEn: "To lose your temper suddenly" },
-      { text: "To lay something at somebody’s door", meaningEn: "To blame someone for something" },
-      { text: "To paint the town red", meaningEn: "To go out and party exuberantly" },
-      { text: "To get cold feet", meaningEn: "To suddenly become nervous or afraid to do something" },
-      { text: "To hang fire", meaningEn: "To delay making a decision" },
-      { text: "To stick to your guns", meaningEn: "To maintain your position firmly" },
-      { text: "To have had your fill of something", meaningEn: "To be fed up or tired of something" },
-      { text: "To sit on the fence", meaningEn: "To avoid taking sides in a dispute" },
-      { text: "To be in for it", meaningEn: "To be about to experience something unpleasant" },
-      { text: "To play the field", meaningEn: "To date multiple people without committing" },
-      { text: "To show your hand", meaningEn: "To reveal your intentions or plans" },
-      { text: "To wear your heart on your sleeve", meaningEn: "To openly show your emotions" },
-      { text: "To carry the day", meaningEn: "To win or succeed in a conflict or competition" },
-      { text: "To manage to keep a straight face", meaningEn: "To not laugh or show emotion" }
+      { text: "To get off the hook", options: ["To escape from a difficult situation or avoid punishment!", "To avoid answering a question by changing the subject."] },
+      { text: "To lay something at somebody’s door", options: ["To offer someone an opportunity they didn’t ask for.", "To blame someone for something, especially something bad.!"] },
+      { text: "To have had your fill of something", options: ["To have had enough of something, especially because you’re tired or annoyed by it.!", "To enjoy something as much as possible while it lasts."] },
+      { text: "To paint the town red", options: ["To go out and celebrate or party exuberantly!", "To become very angry suddenly"] },
+      { text: "To hang fire", options: ["To wait before acting or reacting, often in conflict!", "To do something too soon or before the proper time"] },
+      { text: "To manage to keep a straight face", options: ["To succeed in not laughing or showing emotion, especially in a funny or awkward situation!", "To lose the respect of others or be embarrassed in front of others"] },
+      { text: "A fine kettle of fish", options: ["A difficult or awkward situation; a mess!", "To feel uncomfortable or out of place in a situation"] },
+      { text: "To bite off more than he can chew", options: ["To take on more responsibilities or tasks than one can manage!", "To join others in doing something that is currently popular or fashionable"] },
+      { text: "To have too many irons in the fire", options: ["To be involved in too many activities or projects at the same time, often leading to stress or inefficiency!", "To risk everything on a single venture or decision"] },
+      { text: "To put the cart before the horse", options: ["To do things in the wrong order or to reverse the logical or expected sequence of actions!", "To miss an opportunity by acting too late"] },
+      { text: "To be down in the dumps", options: ["To feel sad, depressed, or discouraged!", "To feel slightly ill or unwell"] },
+      { text: "To shoot/fire from the hip", options: ["To speak or act quickly without thinking carefully first!", "To say openly and honestly what you think"] },
+      { text: "To bark up the wrong tree", options: ["To direct your efforts, accusations, or complaints toward the wrong person or thing; to be mistaken in your approach!", "To create a complicated situation by trying to solve a problem"] },
+      { text: "To grasp at a straw", options: ["To try any possible solution, even if it is very unlikely to succeed — usually in a desperate situation!", "To take a risk by stating or doing something that is different from what most people think"] },
+      { text: "To carry the day", options: ["To win or succeed in a conflict or competition!", "To receive the most attention and admiration in an event or performance."] },
+      { text: "To add fuel to the flame", options: ["To make a bad situation worse by making something more intense!", "To describe exactly what is causing a situation or problem; to state something with precision."] }
     ];
 
     let userName = '';
@@ -107,32 +187,17 @@
 
     startBtn.addEventListener('click', () => {
       userName = userNameInput.value.trim();
-      if (!userName) return;
       entry.style.display = 'none';
       initDiv.style.display = 'block';
       nextInit();
     });
 
-    function getRandomWrong(correctIdx) {
-      const pool = idioms.filter((_, i) => i !== correctIdx);
-      return pool[Math.floor(Math.random() * pool.length)];
-    }
-
     function nextInit() {
       if (initIdx >= idioms.length) {
         const score = responses.filter(r => r.correct).length;
         const avgTime = responses.reduce((sum, r) => sum + r.time, 0) / responses.length;
-
-        const payload = {
-          user: userName,
-          score,
-          avgTime: avgTime.toFixed(2),
-          responses
-        };
-
-        const safeKey = "initial_result_" + userName.toLowerCase().trim().replace(/\s+/g, "_");
-        localStorage.setItem(safeKey, JSON.stringify(payload));
-
+        const safeKey = "initial_result_" + userName.toLowerCase().replace(/\s+/g, "_");
+        localStorage.setItem(safeKey, JSON.stringify({ user: userName, score, avgTime: avgTime.toFixed(2), responses }));
         initDiv.style.display = 'none';
         thankYou.style.display = 'block';
         return;
@@ -140,23 +205,49 @@
 
       const cur = idioms[initIdx];
       initQ.textContent = `${initIdx + 1}. ${cur.text}`;
+      initQ.classList.remove('fade-out');
+      initQ.style.display = 'block';
       initO.innerHTML = '';
+      initO.style.display = 'none';
 
-      const wrong = getRandomWrong(initIdx);
-      const opts = [cur.meaningEn, wrong.meaningEn].sort();
-      opts.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.textContent = opt;
-        btn.className = 'option-btn';
-        btn.onclick = () => {
-          responses.push({ correct: opt === cur.meaningEn, time: Date.now() - startTime });
-          initIdx++;
-          nextInit();
-        };
-        initO.appendChild(btn);
-      });
+      setTimeout(() => {
+        initQ.classList.add('fade-out');
+        initQ.addEventListener('transitionend', displayOptions);
+        setTimeout(() => {
+          if (initO.style.display === 'none') displayOptions();
+        }, 600);
+      }, 2500);
 
-      startTime = Date.now();
+      function displayOptions() {
+        initQ.removeEventListener('transitionend', displayOptions);
+        initQ.style.display = 'none';
+
+        cur.options.forEach(optText => {
+          const isCorrect = optText.endsWith('!');
+          const cleanText = isCorrect ? optText.slice(0, -1) : optText;
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = cleanText;
+
+          // Fotoğraf ekleme
+          const img = document.createElement('img');
+          const fileName = `${initIdx + 1} ${isCorrect ? 'doğru' : 'yanlış'}.jpg`;
+          img.src = `images/${fileName}`;
+          img.alt = cleanText;
+          img.className = 'option-img';
+          btn.appendChild(img);
+
+          btn.onclick = () => {
+            responses.push({ correct: isCorrect, time: Date.now() - startTime });
+            initIdx++;
+            nextInit();
+          };
+          initO.appendChild(btn);
+        });
+
+        initO.style.display = 'block';
+        startTime = Date.now();
+      }
     }
   </script>
 </body>
